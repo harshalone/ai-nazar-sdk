@@ -1,5 +1,5 @@
 {
-  "name": "ai-nazar",
+  "name": "ai-nazar-sdk",
   "version": "0.1.0",
   "description": "AI observability SDK for LLM applications — track cost, latency, tokens, and errors across OpenAI and other providers.",
   "keywords": [

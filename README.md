@@ -7,7 +7,7 @@
 <p align="center">
   <a href="https://github.com/harshalone/ai-nazar-sdk/actions/workflows/ci.yml"><img src="https://github.com/harshalone/ai-nazar-sdk/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="./LICENSE"><img src="https://img.shields.io/github/license/harshalone/ai-nazar-sdk" alt="License"></a>
-  <a href="https://www.npmjs.com/package/ai-nazar"><img src="https://img.shields.io/npm/v/ai-nazar" alt="npm version"></a>
+  <a href="https://www.npmjs.com/package/ai-nazar-sdk"><img src="https://img.shields.io/npm/v/ai-nazar-sdk" alt="npm version"></a>
   <a href="https://github.com/harshalone/ai-nazar-sdk/stargazers"><img src="https://img.shields.io/github/stars/harshalone/ai-nazar-sdk?style=flat" alt="GitHub stars"></a>
 </p>
 
@@ -32,7 +32,7 @@ errors, in real time, with no login required. **[Live demo →](https://ainazar.
 
 ```ts
 import OpenAI from "openai";
-import { Nazar } from "ai-nazar";
+import { Nazar } from "ai-nazar-sdk";
 
 const nazar = Nazar.init({ apiKey: "nz_live_xxxxx" });
 const openai = Nazar.wrapOpenAI(new OpenAI());
@@ -67,11 +67,11 @@ there's a reason to trust AI Nazar with the request path itself.
 ## Installation
 
 ```bash
-npm install ai-nazar
+npm install ai-nazar-sdk
 # or
-pnpm add ai-nazar
+pnpm add ai-nazar-sdk
 # or
-yarn add ai-nazar
+yarn add ai-nazar-sdk
 ```
 
 `openai` is an optional peer dependency — install it if you're using
@@ -83,7 +83,7 @@ yarn add ai-nazar
 ### 1. Initialize once, at application startup
 
 ```ts
-import { Nazar } from "ai-nazar";
+import { Nazar } from "ai-nazar-sdk";
 
 const nazar = Nazar.init({
   apiKey: "nz_live_xxxxx",
@@ -95,7 +95,7 @@ const nazar = Nazar.init({
 
 ```ts
 import OpenAI from "openai";
-import { Nazar } from "ai-nazar";
+import { Nazar } from "ai-nazar-sdk";
 
 const openai = Nazar.wrapOpenAI(new OpenAI());
 ```
