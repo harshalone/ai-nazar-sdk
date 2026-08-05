@@ -17,7 +17,7 @@
   "homepage": "https://github.com/harshalone/ai-nazar-sdk#readme",
   "repository": {
     "type": "git",
-    "url": "https://github.com/harshalone/ai-nazar-sdk.git"
+    "url": "git+https://github.com/harshalone/ai-nazar-sdk.git"
   },
   "bugs": {
     "url": "https://github.com/harshalone/ai-nazar-sdk/issues"
