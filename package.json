@@ -1,5 +1,5 @@
 {
-  "name": "ai-nazar-sdk",
+  "name": "@lonare/ai-nazar-sdk",
   "version": "0.1.0",
   "description": "AI observability SDK for LLM applications — track cost, latency, tokens, and errors across OpenAI and other providers.",
   "keywords": [
@@ -41,6 +41,9 @@
     "assets"
   ],
   "sideEffects": false,
+  "publishConfig": {
+    "access": "public"
+  },
   "engines": {
     "node": ">=18"
   },
