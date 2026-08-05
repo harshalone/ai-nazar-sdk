@@ -1,5 +1,8 @@
 import { NazarClient } from "./client.js";
 import { wrapOpenAI as wrapOpenAIImpl } from "./middleware/openai.js";
+import { wrapOpenRouter as wrapOpenRouterImpl } from "./middleware/openrouter.js";
+import { wrapAnthropic as wrapAnthropicImpl } from "./middleware/anthropic.js";
+import { wrapGemini as wrapGeminiImpl } from "./middleware/gemini.js";
 import type { NazarOptions } from "./types.js";
 
 export type {
@@ -78,6 +81,62 @@ export class Nazar {
    */
   static wrapOpenAI<T extends object>(openai: T, client?: NazarClient): T {
     return wrapOpenAIImpl(client ?? Nazar.getClient(), openai);
+  }
+
+  /**
+   * Wrap an OpenRouter client instance so its calls are observed by AI
+   * Nazar. OpenRouter exposes an OpenAI-compatible API, so this accepts
+   * the same client shape as `wrapOpenAI` — typically an `openai` package
+   * instance pointed at OpenRouter's base URL.
+   *
+   * @example
+   * ```ts
+   * const openrouter = Nazar.wrapOpenRouter(new OpenAI({
+   *   baseURL: "https://openrouter.ai/api/v1",
+   *   apiKey: process.env.OPENROUTER_API_KEY,
+   * }));
+   * await openrouter.chat.completions.create({
+   *   model: "anthropic/claude-sonnet-5",
+   *   messages,
+   * });
+   * ```
+   */
+  static wrapOpenRouter<T extends object>(
+    openrouter: T,
+    client?: NazarClient,
+  ): T {
+    return wrapOpenRouterImpl(client ?? Nazar.getClient(), openrouter);
+  }
+
+  /**
+   * Wrap an Anthropic client instance so its calls are observed by AI
+   * Nazar. Pure observer, identical guarantees to `wrapOpenAI`.
+   *
+   * @example
+   * ```ts
+   * const anthropic = Nazar.wrapAnthropic(new Anthropic());
+   * await anthropic.messages.create({ model: "claude-sonnet-5", messages, max_tokens: 1024 });
+   * ```
+   */
+  static wrapAnthropic<T extends object>(
+    anthropic: T,
+    client?: NazarClient,
+  ): T {
+    return wrapAnthropicImpl(client ?? Nazar.getClient(), anthropic);
+  }
+
+  /**
+   * Wrap a `@google/genai` client instance so its calls are observed by AI
+   * Nazar. Pure observer, identical guarantees to `wrapOpenAI`.
+   *
+   * @example
+   * ```ts
+   * const ai = Nazar.wrapGemini(new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY }));
+   * await ai.models.generateContent({ model: "gemini-2.0-flash", contents: "hello" });
+   * ```
+   */
+  static wrapGemini<T extends object>(ai: T, client?: NazarClient): T {
+    return wrapGeminiImpl(client ?? Nazar.getClient(), ai);
   }
 
   /** Resets the singleton. Intended for tests only. */

@@ -30,6 +30,10 @@ The [dashboard](https://github.com/harshalone/ai-nazar) is the companion
 app that visualizes what this SDK sends — cost, latency, tokens, and
 errors, in real time, with no login required. **[Live demo →](https://ainazar.com)**
 
+<p align="center">
+  <img src="./assets/images/ai-nazar-dashboard.png" alt="AI Nazar dashboard: spend, requests, and error rate across OpenAI, Anthropic, and Gemini models" width="800" />
+</p>
+
 ```ts
 import OpenAI from "openai";
 import { Nazar } from "@lonare/ai-nazar-sdk";
@@ -74,9 +78,13 @@ pnpm add @lonare/ai-nazar-sdk
 yarn add @lonare/ai-nazar-sdk
 ```
 
-`openai` is an optional peer dependency — install it if you're using
-`wrapOpenAI`. AI Nazar works fine without it if you're only calling
-`track()` / `captureException()` manually.
+`openai`, `@anthropic-ai/sdk`, and `@google/genai` are all optional peer
+dependencies — install whichever ones you actually use with `wrapOpenAI`
+/ `wrapOpenRouter` / `wrapAnthropic` / `wrapGemini`. AI Nazar works fine
+without any of them if you're only calling `track()` /
+`captureException()` manually. `wrapOpenRouter` reuses the `openai`
+package (OpenRouter's API is OpenAI-compatible), so it needs no
+additional dependency.
 
 ## Quick start
 
@@ -91,7 +99,7 @@ const nazar = Nazar.init({
 });
 ```
 
-### 2. Wrap your OpenAI client
+### 2. Wrap your AI provider client(s)
 
 ```ts
 import OpenAI from "openai";
@@ -103,6 +111,51 @@ const openai = Nazar.wrapOpenAI(new OpenAI());
 Every `chat.completions.create(...)` call made through `openai` is now
 automatically tracked: provider, model, duration, token usage, estimated
 cost, and errors — with **no other code changes required**.
+
+The same one-line pattern works for OpenRouter, Anthropic, and Gemini:
+
+```ts
+import OpenAI from "openai";
+import Anthropic from "@anthropic-ai/sdk";
+import { GoogleGenAI } from "@google/genai";
+import { Nazar } from "@lonare/ai-nazar-sdk";
+
+// OpenRouter — OpenAI-compatible API, same `openai` package, different baseURL.
+const openrouter = Nazar.wrapOpenRouter(
+  new OpenAI({
+    baseURL: "https://openrouter.ai/api/v1",
+    apiKey: process.env.OPENROUTER_API_KEY,
+  }),
+);
+await openrouter.chat.completions.create({
+  model: "anthropic/claude-sonnet-5",
+  messages: [{ role: "user", content: "Explain OAuth" }],
+});
+
+// Anthropic (Claude)
+const anthropic = Nazar.wrapAnthropic(new Anthropic());
+await anthropic.messages.create({
+  model: "claude-sonnet-5",
+  max_tokens: 1024,
+  messages: [{ role: "user", content: "Explain OAuth" }],
+});
+
+// Google Gemini
+const ai = Nazar.wrapGemini(
+  new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY }),
+);
+await ai.models.generateContent({
+  model: "gemini-2.0-flash",
+  contents: "Explain OAuth",
+});
+```
+
+Each wrapper instruments only that provider's generation call
+(`chat.completions.create` for OpenAI/OpenRouter, `messages.create` for
+Anthropic, `models.generateContent`/`generateContentStream` for Gemini)
+— every other method and property passes through completely untouched,
+with the same unmodified-args/unmodified-return/never-swallow-errors
+guarantees as `wrapOpenAI`.
 
 ### 3. Or track manually, for any provider
 
@@ -155,6 +208,25 @@ Returns a transparent proxy around an OpenAI client instance. Instruments
 untouched. Uses the singleton from `Nazar.init()` unless a specific
 `NazarClient` is passed as the second argument.
 
+### `Nazar.wrapOpenRouter(openrouterClient, client?)`
+
+Same contract as `wrapOpenAI`, for an OpenAI-compatible client pointed at
+OpenRouter (`baseURL: "https://openrouter.ai/api/v1"`). Events are
+tagged `provider: "openrouter"` with `model` set to OpenRouter's
+`vendor/model` slug (e.g. `"anthropic/claude-sonnet-5"`).
+
+### `Nazar.wrapAnthropic(anthropicClient, client?)`
+
+Returns a transparent proxy around an `@anthropic-ai/sdk` client
+instance. Instruments `messages.create`; every other property and method
+passes through untouched.
+
+### `Nazar.wrapGemini(genaiClient, client?)`
+
+Returns a transparent proxy around a `@google/genai` client instance.
+Instruments `models.generateContent` and `models.generateContentStream`;
+every other property and method passes through untouched.
+
 ### `nazar.track(event)`
 
 Record a single AI request observation.
@@ -197,7 +269,7 @@ flushes and stops background timers; call it on graceful shutdown.
 ```ts
 interface AIRequestEvent {
   id?: string;
-  provider: string; // "openai", "anthropic", "custom", ...
+  provider: string; // "openai", "openrouter", "anthropic", "gemini", "custom", ...
   model: string;
   inputTokens?: number;
   outputTokens?: number;
@@ -282,9 +354,10 @@ prefixed with `[AI Nazar]`.
 This first release is intentionally the smallest useful foundation. It's
 built so the following can be layered on without breaking changes:
 
-- **More providers**: Anthropic, Gemini, and others via the same
-  observer pattern (`Nazar.wrapAnthropic`, etc.), sharing the
-  provider-agnostic `AIRequestEvent` model.
+- **More providers**: OpenAI, OpenRouter, Anthropic, and Gemini are
+  covered today via the same observer pattern; further providers (local
+  models, Bedrock, Azure OpenAI, ...) can be added the same way, sharing
+  the provider-agnostic `AIRequestEvent` model.
 - **Framework integrations**: LangChain, Vercel AI SDK.
 - **A gateway layer** (`nazar.ai.generate()`): once there's adoption and
   trust in the observability path, an opt-in unified call surface for

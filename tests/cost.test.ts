@@ -26,4 +26,34 @@ describe("estimateCost", () => {
     const cost = estimateCost("openai", "gpt-4o", 0, 0);
     expect(cost).toBe(0);
   });
+
+  it("computes cost for a known Anthropic model", () => {
+    const cost = estimateCost(
+      "anthropic",
+      "claude-sonnet-5",
+      1_000_000,
+      1_000_000,
+    );
+    expect(cost).toBeCloseTo(3 + 15, 5);
+  });
+
+  it("computes cost for a known Gemini model", () => {
+    const cost = estimateCost(
+      "gemini",
+      "gemini-2.0-flash",
+      1_000_000,
+      1_000_000,
+    );
+    expect(cost).toBeCloseTo(0.1 + 0.4, 5);
+  });
+
+  it("returns undefined for openrouter (no static pricing table)", () => {
+    const cost = estimateCost(
+      "openrouter",
+      "anthropic/claude-sonnet-5",
+      1_000_000,
+      1_000_000,
+    );
+    expect(cost).toBeUndefined();
+  });
 });

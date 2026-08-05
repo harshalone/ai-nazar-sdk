@@ -21,6 +21,24 @@ const PRICING_PER_MILLION_TOKENS: Record<
   "openai:gpt-5.5": { input: 3, output: 12 },
   "openai:o1": { input: 15, output: 60 },
   "openai:o1-mini": { input: 3, output: 12 },
+
+  "anthropic:claude-sonnet-5": { input: 3, output: 15 },
+  "anthropic:claude-opus-5": { input: 15, output: 75 },
+  "anthropic:claude-haiku-4.5": { input: 1, output: 5 },
+  "anthropic:claude-3-5-sonnet-20241022": { input: 3, output: 15 },
+  "anthropic:claude-3-5-haiku-20241022": { input: 0.8, output: 4 },
+  "anthropic:claude-3-opus-20240229": { input: 15, output: 75 },
+
+  "gemini:gemini-2.0-flash": { input: 0.1, output: 0.4 },
+  "gemini:gemini-2.0-flash-lite": { input: 0.075, output: 0.3 },
+  "gemini:gemini-1.5-pro": { input: 1.25, output: 5 },
+  "gemini:gemini-1.5-flash": { input: 0.075, output: 0.3 },
+
+  // OpenRouter is a routing layer over many upstream providers/models with
+  // its own per-route pricing (and per-request price variance for
+  // some models) — no static table is maintained here. `cost` stays
+  // `undefined` for OpenRouter calls unless the caller supplies it
+  // explicitly to `track()`.
 };
 
 /** Normalizes a model name to increase the odds of a pricing table hit. */

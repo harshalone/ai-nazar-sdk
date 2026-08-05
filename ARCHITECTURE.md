@@ -26,7 +26,11 @@ src/
 ├── types.ts               AIRequestEvent and all public types
 ├── transport.ts            HttpTransport: queue, batch, retry, backoff
 ├── middleware/
-│   └── openai.ts               wrapOpenAI: the observer proxy
+│   ├── shared.ts                 createObserverWrap: shared proxy core
+│   ├── openai.ts                  wrapOpenAI: OpenAI provider adapter
+│   ├── openrouter.ts               wrapOpenRouter: OpenAI-compatible adapter
+│   ├── anthropic.ts                 wrapAnthropic: Claude provider adapter
+│   └── gemini.ts                     wrapGemini: Gemini provider adapter
 └── utils/
     ├── redact.ts                  Built-in + custom redaction
     ├── cost.ts                     Static pricing table → cost estimate
@@ -36,11 +40,17 @@ src/
 ```
 
 Dependency direction is strictly one-way:
-`index.ts → client.ts → transport.ts → utils/*`, with `middleware/openai.ts`
-depending only on `client.ts`'s public interface. No module reaches back
-"up" the chain. This is what makes it possible to add
-`middleware/anthropic.ts` or `middleware/gemini.ts` later without
-touching `client.ts` or `transport.ts` at all.
+`index.ts → client.ts → transport.ts → utils/*`, with each
+`middleware/*.ts` provider adapter depending only on `client.ts`'s public
+interface (and, internally, on the shared proxy core in
+`middleware/shared.ts`). No module reaches back "up" the chain. This is
+what made it possible to add `middleware/anthropic.ts`,
+`middleware/gemini.ts`, and `middleware/openrouter.ts` without touching
+`client.ts` or `transport.ts` at all — each is a `ProviderAdapter`
+(model/prompt/usage extraction for that provider's request and response
+shapes) plugged into `createObserverWrap` from `middleware/shared.ts`,
+which owns the actual `Proxy`, promise instrumentation, and event
+recording.
 
 ## Why an observer, not a gateway
 
@@ -143,9 +153,12 @@ than an obviously-redacted field.
 The module boundaries above are chosen so each of these lands as an
 additive change:
 
-- **`middleware/anthropic.ts`, `middleware/gemini.ts`**: same observer
-  pattern as `middleware/openai.ts`, same `AIRequestEvent` shape, new
-  provider-specific pricing entries in `utils/cost.ts`.
+- **More providers** beyond the four shipped today (OpenAI, OpenRouter,
+  Anthropic, Gemini): implement a `ProviderAdapter` (see
+  `middleware/shared.ts`) for the new SDK's request/response shape and
+  plug it into `createObserverWrap` — same `AIRequestEvent` shape, no
+  changes to `client.ts` or `transport.ts`, plus new provider-specific
+  pricing entries in `utils/cost.ts` where a static price makes sense.
 - **Framework adapters** (LangChain callback handler, Vercel AI SDK
   middleware): thin translators from that framework's instrumentation
   hooks into `client.track()` — no changes to `client.ts` or
@@ -167,14 +180,17 @@ additive change:
 ## Testing strategy
 
 Each module is tested in isolation with fakes rather than the real
-network or a real OpenAI client:
+network or a real provider client:
 
 - `transport.test.ts` stubs `global.fetch` and asserts on batching,
   retry counts, and backoff behavior without real timers or sockets.
-- `wrap-openai.test.ts` uses a minimal fake shaped like the real OpenAI
-  client and asserts, above all, that the wrapped client's return values
-  and thrown errors are referentially the *same* objects the fake
-  produced — the load-bearing guarantee of the observer pattern.
+- `wrap-openai.test.ts`, `wrap-openrouter.test.ts`, `wrap-anthropic.test.ts`,
+  and `wrap-gemini.test.ts` each use a minimal fake shaped like the real
+  provider client and assert, above all, that the wrapped client's
+  return values and thrown errors are referentially the *same* objects
+  the fake produced — the load-bearing guarantee of the observer
+  pattern, verified independently per provider even though they share
+  `middleware/shared.ts` under the hood.
 - `client.test.ts` uses an in-memory `Transport` implementation
   (`tests/helpers/memory-transport.ts`) so client logic (defaulting,
   redaction wiring, validation) is tested independently of delivery

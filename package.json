@@ -1,11 +1,15 @@
 {
   "name": "@lonare/ai-nazar-sdk",
-  "version": "0.1.1",
-  "description": "AI observability SDK for LLM applications — track cost, latency, tokens, and errors across OpenAI and other providers.",
+  "version": "0.2.0",
+  "description": "AI observability SDK for LLM applications — track cost, latency, tokens, and errors across OpenAI, OpenRouter, Anthropic, Gemini, and other providers.",
   "keywords": [
     "ai",
     "observability",
     "openai",
+    "openrouter",
+    "anthropic",
+    "claude",
+    "gemini",
     "llm",
     "monitoring",
     "sentry",
@@ -61,14 +65,24 @@
     "prepublishOnly": "npm run build"
   },
   "peerDependencies": {
-    "openai": ">=4.0.0"
+    "openai": ">=4.0.0",
+    "@anthropic-ai/sdk": ">=0.20.0",
+    "@google/genai": ">=0.1.0"
   },
   "peerDependenciesMeta": {
     "openai": {
       "optional": true
+    },
+    "@anthropic-ai/sdk": {
+      "optional": true
+    },
+    "@google/genai": {
+      "optional": true
     }
   },
   "devDependencies": {
+    "@anthropic-ai/sdk": "^0.115.0",
+    "@google/genai": "^2.15.0",
     "@types/node": "^20.14.0",
     "@typescript-eslint/eslint-plugin": "^7.16.0",
     "@typescript-eslint/parser": "^7.16.0",
