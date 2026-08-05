@@ -2,13 +2,33 @@
   <img src="./assets/images/nazar-logo-bg-transparent.png" alt="AI Nazar logo" width="200" />
 </p>
 
-# AI Nazar
+<h1 align="center">AI Nazar</h1>
+
+<p align="center">
+  <a href="https://github.com/harshalone/ai-nazar-sdk/actions/workflows/ci.yml"><img src="https://github.com/harshalone/ai-nazar-sdk/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <a href="./LICENSE"><img src="https://img.shields.io/github/license/harshalone/ai-nazar-sdk" alt="License"></a>
+  <a href="https://www.npmjs.com/package/ai-nazar"><img src="https://img.shields.io/npm/v/ai-nazar" alt="npm version"></a>
+  <a href="https://github.com/harshalone/ai-nazar-sdk/stargazers"><img src="https://img.shields.io/github/stars/harshalone/ai-nazar-sdk?style=flat" alt="GitHub stars"></a>
+</p>
 
 **Open-source AI observability for LLM applications.** Track cost, latency,
 tokens, errors, and model usage — without changing how you call your AI
 provider.
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
+<p align="center">
+  <a href="#why-ai-nazar">Why AI Nazar</a> •
+  <a href="#installation">Installation</a> •
+  <a href="#quick-start">Quick start</a> •
+  <a href="#api">API</a> •
+  <a href="#data-model">Data model</a> •
+  <a href="#privacy">Privacy</a> •
+  <a href="#roadmap">Roadmap</a> •
+  <a href="#contributing">Contributing</a>
+</p>
+
+The [dashboard](https://github.com/harshalone/ai-nazar) is the companion
+app that visualizes what this SDK sends — cost, latency, tokens, and
+errors, in real time, with no login required. **[Live demo →](https://ainazar.com)**
 
 ```ts
 import OpenAI from "openai";
@@ -281,8 +301,9 @@ evolve toward provider expansion and a gateway layer.
 
 ## Contributing
 
-Issues and PRs welcome. Please run the full check suite before
-submitting:
+Issues and PRs welcome — see [CONTRIBUTING.md](./CONTRIBUTING.md) for
+local setup, the check suite, and the release process. Please run the
+full check suite before submitting:
 
 ```bash
 npm run lint
@@ -293,4 +314,4 @@ npm run build
 
 ## License
 
-MIT
+[MIT](./LICENSE)

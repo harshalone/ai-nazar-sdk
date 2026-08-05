@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Question / discussion
+    url: https://github.com/harshalone/ai-nazar-sdk/discussions
+    about: Ask a question or start a discussion about the project.
+  - name: Contributing guide
+    url: https://github.com/harshalone/ai-nazar-sdk/blob/main/CONTRIBUTING.md
+    about: Read this before opening an issue about contributing or local setup.
