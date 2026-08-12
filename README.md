@@ -214,7 +214,7 @@ Initializes the SDK and returns a `NazarClient`. Call once at startup.
 | Option | Type | Default | Description |
 |---|---|---|---|
 | `apiKey` | `string` | — | **Required.** Your AI Nazar API key. |
-| `endpoint` | `string` | `https://api.ainazar.com` | API base URL. Override for self-hosting or testing. |
+| `endpoint` | `string` | `https://www.ainazar.com/api` | API base URL. Override for self-hosting or testing. |
 | `environment` | `string` | auto-detected from `NODE_ENV` | Free-form environment label (`"production"`, `"staging"`, …). |
 | `capturePrompts` | `boolean` | `false` | Capture raw prompt content on events. |
 | `captureResponses` | `boolean` | `false` | Capture raw response content on events. |

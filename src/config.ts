@@ -1,6 +1,6 @@
 import type { NazarConfig, NazarOptions } from "./types.js";
 
-export const DEFAULT_ENDPOINT = "https://api.ainazar.com";
+export const DEFAULT_ENDPOINT = "https://www.ainazar.com/api";
 
 const DEFAULTS = {
   environment: "development",

@@ -12,7 +12,7 @@ import { generateId } from "./utils/id.js";
 import { Logger } from "./utils/logger.js";
 
 export const SDK_NAME = "ai-nazar";
-export const SDK_VERSION = "0.2.0";
+export const SDK_VERSION = "0.2.1";
 
 /**
  * The AI Nazar client. Construct via `Nazar.init()` rather than directly —

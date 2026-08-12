@@ -77,7 +77,7 @@ describe("HttpTransport", () => {
     await transport.flush();
 
     const [url, init] = fetchMock.mock.calls[0]!;
-    expect(url).toBe("https://api.ainazar.com/v1/events");
+    expect(url).toBe("https://www.ainazar.com/api/v1/events");
     expect(init.headers.authorization).toBe("Bearer nz_live_secret");
     expect(init.headers["content-type"]).toBe("application/json");
     await transport.shutdown();

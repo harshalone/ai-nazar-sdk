@@ -1,6 +1,6 @@
 {
   "name": "@lonare/ai-nazar-sdk",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "AI observability SDK for LLM applications — track cost, latency, tokens, and errors across OpenAI, OpenRouter, Anthropic, Gemini, and other providers.",
   "keywords": [
     "ai",
