@@ -48,6 +48,16 @@ const completion = await openai.chat.completions.create({
 });
 ```
 
+OpenAI is just the first example — OpenRouter, Anthropic, and Gemini are
+wrapped the same one-line way. See the table and examples below.
+
+| Provider | Wrap with | Underlying package |
+|---|---|---|
+| OpenAI | `Nazar.wrapOpenAI(client)` | `openai` |
+| OpenRouter | `Nazar.wrapOpenRouter(client)` | `openai` (pointed at OpenRouter's `baseURL`) |
+| Anthropic (Claude) | `Nazar.wrapAnthropic(client)` | `@anthropic-ai/sdk` |
+| Google Gemini | `Nazar.wrapGemini(client)` | `@google/genai` |
+
 ## Why AI Nazar
 
 If you've used [Sentry](https://sentry.io) for error tracking, AI Nazar
@@ -101,26 +111,31 @@ const nazar = Nazar.init({
 
 ### 2. Wrap your AI provider client(s)
 
+Every wrapper follows the same one-line pattern: pass your existing
+provider client in, get back a transparent proxy that tracks provider,
+model, duration, token usage, estimated cost, and errors — with **no
+other code changes required**. Pick the provider(s) you use:
+
+**OpenAI**
+
 ```ts
 import OpenAI from "openai";
 import { Nazar } from "@lonare/ai-nazar-sdk";
 
 const openai = Nazar.wrapOpenAI(new OpenAI());
+await openai.chat.completions.create({
+  model: "gpt-5.5",
+  messages: [{ role: "user", content: "Explain OAuth" }],
+});
 ```
 
-Every `chat.completions.create(...)` call made through `openai` is now
-automatically tracked: provider, model, duration, token usage, estimated
-cost, and errors — with **no other code changes required**.
-
-The same one-line pattern works for OpenRouter, Anthropic, and Gemini:
+**OpenRouter** — OpenAI-compatible API, so it reuses the `openai`
+package, just pointed at a different `baseURL`:
 
 ```ts
 import OpenAI from "openai";
-import Anthropic from "@anthropic-ai/sdk";
-import { GoogleGenAI } from "@google/genai";
 import { Nazar } from "@lonare/ai-nazar-sdk";
 
-// OpenRouter — OpenAI-compatible API, same `openai` package, different baseURL.
 const openrouter = Nazar.wrapOpenRouter(
   new OpenAI({
     baseURL: "https://openrouter.ai/api/v1",
@@ -131,16 +146,28 @@ await openrouter.chat.completions.create({
   model: "anthropic/claude-sonnet-5",
   messages: [{ role: "user", content: "Explain OAuth" }],
 });
+```
 
-// Anthropic (Claude)
+**Anthropic (Claude)**
+
+```ts
+import Anthropic from "@anthropic-ai/sdk";
+import { Nazar } from "@lonare/ai-nazar-sdk";
+
 const anthropic = Nazar.wrapAnthropic(new Anthropic());
 await anthropic.messages.create({
   model: "claude-sonnet-5",
   max_tokens: 1024,
   messages: [{ role: "user", content: "Explain OAuth" }],
 });
+```
 
-// Google Gemini
+**Google Gemini**
+
+```ts
+import { GoogleGenAI } from "@google/genai";
+import { Nazar } from "@lonare/ai-nazar-sdk";
+
 const ai = Nazar.wrapGemini(
   new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY }),
 );
@@ -155,7 +182,7 @@ Each wrapper instruments only that provider's generation call
 Anthropic, `models.generateContent`/`generateContentStream` for Gemini)
 — every other method and property passes through completely untouched,
 with the same unmodified-args/unmodified-return/never-swallow-errors
-guarantees as `wrapOpenAI`.
+guarantees across all four wrappers.
 
 ### 3. Or track manually, for any provider
 
